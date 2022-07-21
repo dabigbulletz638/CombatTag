@@ -1,0 +1,39 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'java'
+
+group = 'cc.crystalpvp.combattag'
+version = '1.0'
+
+sourceCompatibility = targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        url = 'https://papermc.io/repo/repository/maven-public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven {
+        name = 'dmulloy2'
+        url = 'https://repo.dmulloy2.net/repository/public/'
+    }
+}
+
+dependencies {
+    compileOnly group: 'com.destroystokyo.paper', name: 'paper-api', version: '1.12.2-R0.1-SNAPSHOT'
+
+    compileOnly group: 'com.comphenix.protocol', name: 'ProtocolLib', version: '4.6.1-SNAPSHOT'
+    compileOnly group: 'com.comphenix.packetwrapper', name: 'PacketWrapper', version: '1.12.1-R0.1-SNAPSHOT'
+
+    compileOnly group: 'it.unimi.dsi', name: 'fastutil', version: '7.1.0'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}

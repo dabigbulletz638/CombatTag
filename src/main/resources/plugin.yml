@@ -1,0 +1,4 @@
+name: CombatTag
+version: @version@
+main: cc.crystalpvp.combattag.CombatTag
+depend: [ProtocolLib]
