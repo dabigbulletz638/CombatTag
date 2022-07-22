@@ -129,6 +129,7 @@ public class CombatTag extends JavaPlugin implements Listener {
     private void onDisconnect(final Player player) {
         final UUID uuid = player.getUniqueId();
         if (this.tagged.containsKey(uuid)) {
+            this.getServer().broadcastMessage(PREFIX + "\247c" + player.getName() + " \2477logged out in combat!");
             player.setHealth(0.0D);
             this.tagged.remove(uuid);
             if (!this.killedPlayers.contains(uuid)) {
