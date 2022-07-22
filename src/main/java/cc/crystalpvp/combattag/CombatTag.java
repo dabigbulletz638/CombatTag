@@ -76,7 +76,7 @@ public class CombatTag extends JavaPlugin implements Listener {
             if (crystal.hasMetadata("dmp.enderCrystalPlacer")) {
                 final List<MetadataValue> metadataValues = crystal.getMetadata("dmp.enderCrystalPlacer");
                 final Player attacker = Bukkit.getPlayer(UUID.fromString(metadataValues.get(0).asString()));
-                if (attacker != null) {
+                if (attacker != null && attacker != victim) {
                     this.tagged.put(attacker.getUniqueId(), now);
                 }
                 this.tagged.put(victim.getUniqueId(), now);
