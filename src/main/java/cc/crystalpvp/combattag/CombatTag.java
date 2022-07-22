@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -75,7 +76,9 @@ public class CombatTag extends JavaPlugin implements Listener {
             if (crystal.hasMetadata("dmp.enderCrystalPlacer")) {
                 final List<MetadataValue> metadataValues = crystal.getMetadata("dmp.enderCrystalPlacer");
                 final Player attacker = Bukkit.getPlayer(UUID.fromString(metadataValues.get(0).asString()));
-                this.tagged.put(attacker.getUniqueId(), now);
+                if (attacker != null) {
+                    this.tagged.put(attacker.getUniqueId(), now);
+                }
                 this.tagged.put(victim.getUniqueId(), now);
             }
         }
@@ -88,10 +91,41 @@ public class CombatTag extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerDeath(final PlayerDeathEvent event) {
-        final Player player = event.getEntity();
-        if (this.tagged.containsKey(player.getUniqueId())) {
-            this.tagged.remove(player.getUniqueId());
-            player.sendMessage(PREFIX + "You are no longer in combat.");
+        final Player victim = event.getEntity();
+        if (this.tagged.containsKey(victim.getUniqueId())) {
+            this.tagged.remove(victim.getUniqueId());
+            victim.sendMessage(PREFIX + "You are no longer in combat.");
+        }
+        Entity damager = null;
+        if (victim.hasMetadata("dmp.lastDamageEnt")) {
+            damager = (Entity) victim.getMetadata("dmp.lastDamageEnt").get(0).value();
+        }
+        if (damager == null || victim.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUICIDE) {
+            return;
+        }
+        if (damager instanceof EnderCrystal) {
+            final EnderCrystal crystal = (EnderCrystal) damager;
+            if (crystal.hasMetadata("dmp.enderCrystalPlacer")) {
+                final List<MetadataValue> metadataValues = crystal.getMetadata("dmp.enderCrystalPlacer");
+                if (metadataValues.size() > 0) {
+                    final Player killer = Bukkit.getPlayer(
+                            UUID.fromString(metadataValues.get(0).asString())
+                    );
+                    if (killer == null || victim == killer) {
+                        return;
+                    }
+                    if (this.tagged.containsKey(killer.getUniqueId())) {
+                        this.tagged.remove(killer.getUniqueId());
+                        this.sendActionBar(killer, "You are no longer in combat.");
+                    }
+                }
+            }
+        } else if (victim != damager && damager instanceof Player) {
+            final Player player = (Player) damager;
+            if (this.tagged.containsKey(player.getUniqueId())) {
+                this.tagged.remove(player.getUniqueId());
+                this.sendActionBar(player, "You are no longer in combat.");
+            }
         }
     }
 
