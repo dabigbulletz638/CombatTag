@@ -54,7 +54,7 @@ public class CombatTag extends JavaPlugin implements Listener {
         }, 0, 20);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
         final Entity damager = event.getDamager();
         final Entity victim = event.getEntity();
